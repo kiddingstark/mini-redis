@@ -16,6 +16,7 @@
 
     <modules>
         <module>mini-redis-server</module>
+        <module>mini-redis-client</module>
     </modules>
 
 
