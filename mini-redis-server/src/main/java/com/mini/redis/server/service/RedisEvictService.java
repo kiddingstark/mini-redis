@@ -31,20 +31,20 @@ public class RedisEvictService {
     public static EvictionPoolEntry[] EvictionPoolLRU = new EvictionPoolEntry[EVPOOL_SIZE];
 
     public void freeMemoryIfNeeded() {
-        long memory = Runtime.getRuntime().maxMemory();
         long totalMemory = Runtime.getRuntime().totalMemory();
-        long usedMemory = memory - totalMemory;
+        long usedMemory = totalMemory - Runtime.getRuntime().freeMemory();
 
         RedisServer redisServer = RedisServer.getRedisServer();
         int maxMemoryPolicy = redisServer.getMaxMemoryPolicy();
 
-        long maxMemory = redisServer.getMaxMemory();
-        long toFreeMemory = usedMemory - maxMemory;
+        long redisMaxMemory = redisServer.getMaxMemory();
+        long toFreeMemory = usedMemory - redisMaxMemory;
         long freeMemory = 0;
 
-        log.info("unit:m, usedMemory:{},maxMemory:{},toFreeMemory:{}",
+        log.info("unit:m, totalMemory:{},usedMemory:{},maxMemory:{},toFreeMemory:{}",
+                totalMemory / MEMORY_UNIT,
                 usedMemory / MEMORY_UNIT,
-                maxMemory / MEMORY_UNIT,
+                redisMaxMemory / MEMORY_UNIT,
                 toFreeMemory / MEMORY_UNIT);
         List<RedisDb> redisDbs = redisServer.getRedisDbs();
         while (freeMemory < toFreeMemory) {

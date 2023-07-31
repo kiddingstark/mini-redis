@@ -6,10 +6,12 @@ import com.mini.redis.server.constant.ResultCode;
 import com.mini.redis.server.struct.RedisClient;
 import com.mini.redis.server.struct.RedisServer;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +25,8 @@ public class RedisServerService {
 
     @Autowired
     private ApplicationContextConfig applicationContextConfig;
+    @Autowired
+    private RedisEvictService redisEvictService;
 
     /**
      * connect
@@ -51,7 +55,11 @@ public class RedisServerService {
      * @return
      */
     public String processCommand(String clientIp, String processCommand) {
-        String[] argv = processCommand.split(" ");
+        //freeMemoryIfNeeded
+        redisEvictService.freeMemoryIfNeeded();
+        //processAfterFree
+        String[] argv = Arrays.stream(processCommand.split(" "))
+                .filter(StringUtils::isNotBlank).toArray(String[]::new);
         RedisCommand redisCommand = RedisCommand.getRedisCommandByCommandType(argv[0]);
         if (Objects.isNull(redisCommand)) {
             return String.format(ResultCode.UNKOWN_COMMAND.getMsg(), argv[0]);

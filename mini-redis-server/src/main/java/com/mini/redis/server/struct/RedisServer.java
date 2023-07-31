@@ -54,9 +54,9 @@ public class RedisServer implements Serializable {
     /**
      * Max number of memory bytes to use
      *
-     * -Xmx: 100 * 1024 * 1024
+     * -Xmx: (512+16) * 1024 * 1024
      */
-    private long maxMemory = 90 * 1024 * 1024;
+    private long maxMemory = 512 * 1024 * 1024;
 
     /**
      * @see RedisMaxMemoryPolicy
